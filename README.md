@@ -24,7 +24,7 @@ When a user drops garbage on the bin’s plate, a **webcam** captures the image,
 **Software:**  
 - Python  
 - OpenCV  
-- TensorFlow / Keras  
+- Pytorch  
 - Arduino IDE  
 
 **Communication:**  
