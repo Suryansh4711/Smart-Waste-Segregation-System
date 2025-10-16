@@ -1,115 +1,181 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Home, Settings, Users, BarChart3, Trash2, Bell } from 'lucide-react';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export default function Home() {
+export default function Dashboard() {
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20`}
-    >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Top Navigation */}
+      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <Trash2 className="h-8 w-8 text-emerald-600 mr-3" />
+              <h1 className="text-2xl font-bold text-gray-900">Smart Waste Management</h1>
+            </div>
+            
+            <nav className="flex items-center space-x-8">
+              <a href="#" className="flex items-center px-3 py-2 text-sm font-medium text-emerald-600 bg-emerald-50 rounded-lg">
+                <Home className="h-4 w-4 mr-2" />
+                Dashboard
+              </a>
+              <a href="#" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Analytics
+              </a>
+              <a href="#" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+                <Users className="h-4 w-4 mr-2" />
+                Users
+              </a>
+              <a href="#" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </a>
+            </nav>
+
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="sm" className="relative">
+                <Bell className="h-4 w-4" />
+                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+              </Button>
+              <Badge variant="secondary" className="bg-emerald-100 text-emerald-800">Admin</Badge>
+              <Button variant="outline" size="sm" className="hover:bg-gray-50">
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Dashboard Overview</h2>
+          <p className="text-gray-600">Monitor and manage your waste collection system</p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                Total Waste Collected
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-gray-900 mb-1">-- kg</div>
+              <p className="text-sm text-gray-500">Data loading...</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                Recycling Rate
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-gray-900 mb-1">--%</div>
+              <p className="text-sm text-gray-500">Data loading...</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                Active Bins
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-gray-900 mb-1">--</div>
+              <p className="text-sm text-gray-500">Data loading...</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                Collection Routes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-gray-900 mb-1">--</div>
+              <p className="text-sm text-gray-500">Data loading...</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Content Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="border-b border-gray-100 pb-4">
+              <CardTitle className="text-lg font-semibold text-gray-900">Recent Activity</CardTitle>
+              <CardDescription className="text-gray-600">Latest waste collection updates</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="text-center py-12">
+                <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+                  <BarChart3 className="h-full w-full" />
+                </div>
+                <p className="text-gray-500 text-sm">No recent activity to display</p>
+                <p className="text-gray-400 text-xs mt-1">Activity will appear here once data is available</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="border-b border-gray-100 pb-4">
+              <CardTitle className="text-lg font-semibold text-gray-900">System Status</CardTitle>
+              <CardDescription className="text-gray-600">Current system health and monitoring</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between py-3 border-b border-gray-50">
+                  <span className="text-sm font-medium text-gray-700">System Health</span>
+                  <Badge className="bg-gray-100 text-gray-600">Checking...</Badge>
+                </div>
+                <div className="flex items-center justify-between py-3 border-b border-gray-50">
+                  <span className="text-sm font-medium text-gray-700">Database Status</span>
+                  <Badge className="bg-gray-100 text-gray-600">Checking...</Badge>
+                </div>
+                <div className="flex items-center justify-between py-3">
+                  <span className="text-sm font-medium text-gray-700">API Response</span>
+                  <Badge className="bg-gray-100 text-gray-600">Checking...</Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mt-8">
+          <Card className="border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-gray-900">Quick Actions</CardTitle>
+              <CardDescription className="text-gray-600">Common tasks and operations</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Button className="h-12 bg-emerald-600 hover:bg-emerald-700 text-white">
+                  Add New Bin
+                </Button>
+                <Button variant="outline" className="h-12 border-emerald-200 text-emerald-700 hover:bg-emerald-50">
+                  Schedule Collection
+                </Button>
+                <Button variant="outline" className="h-12 border-blue-200 text-blue-700 hover:bg-blue-50">
+                  Generate Report
+                </Button>
+                <Button variant="outline" className="h-12 border-purple-200 text-purple-700 hover:bg-purple-50">
+                  View Analytics
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
