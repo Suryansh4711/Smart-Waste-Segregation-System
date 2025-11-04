@@ -1,401 +1,337 @@
-import React, { useState, useRef } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Home, Settings, Users, BarChart3, Trash2, Bell, Camera, User } from 'lucide-react';
+import React, { useState, useRef } from "react";
+import styles from "../styles/WasteClassifier.module.css";
 
-export default function SmartWasteSegregationSystem() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
-  const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [scanResult, setScanResult] = useState<{ category: string; confidence?: number } | null>(null);
-  const [isScanning, setIsScanning] = useState(false);
+const WasteClassifier: React.FC = () => {
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [classificationResult, setClassificationResult] = useState<string>("");
+  const [confidence, setConfidence] = useState<number>(0);
+  const [isClassifying, setIsClassifying] = useState<boolean>(false);
+  const [isCameraActive, setIsCameraActive] = useState<boolean>(false);
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoggedIn(true);
+  // Handle file upload
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+        setClassificationResult("");
+        setConfidence(0);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  const handleSignup = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle signup logic here
-    alert('Signup functionality - redirecting to login');
-    setActiveTab('login');
-  };
-
+  // Start camera
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
+      });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.muted = true;
+        videoRef.current.playsInline = true;
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play();
+        };
+        setIsCameraActive(true);
       }
     } catch (error) {
-      console.error('Error accessing camera:', error);
+      console.error("Error accessing camera:", error);
+      alert("Could not access camera. Please check permissions.");
     }
   };
 
+  // Capture image from camera
   const captureImage = () => {
     if (videoRef.current && canvasRef.current) {
-      const canvas = canvasRef.current;
-      const video = videoRef.current;
-      const context = canvas.getContext('2d');
-      
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      
+      const context = canvasRef.current.getContext("2d");
       if (context) {
-        context.drawImage(video, 0, 0);
-        const imageData = canvas.toDataURL('image/png');
-        setCapturedImage(imageData);
+        canvasRef.current.width = videoRef.current.videoWidth;
+        canvasRef.current.height = videoRef.current.videoHeight;
+        context.drawImage(videoRef.current, 0, 0);
         
-        // Stop camera
-        const stream = video.srcObject as MediaStream;
-        stream?.getTracks().forEach(track => track.stop());
+        const imageDataUrl = canvasRef.current.toDataURL("image/png");
+        setImagePreview(imageDataUrl);
+        stopCamera();
+        setClassificationResult("");
+        setConfidence(0);
       }
     }
   };
 
-  const scanNow = async () => {
-    if (!capturedImage) return;
+  // Stop camera
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+      setIsCameraActive(false);
+    }
+  };
+
+  // Classify image (mock classification - replace with actual API call)
+  const classifyImage = async () => {
+    if (!imagePreview) {
+      alert("Please upload or capture an image first!");
+      return;
+    }
+
+    setIsClassifying(true);
     
-    setIsScanning(true);
-    
-    // Simulate AI processing
+    // Simulate API call - Replace with your actual classification API
     setTimeout(() => {
-      const categories = ['Plastic', 'Paper', 'Metal', 'Glass', 'Organic', 'E-waste'];
-      const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-      const confidence = Math.floor(Math.random() * 30) + 70; // 70-99%
+      const wasteTypes = [
+        { type: "Plastic", confidence: 92, color: "#3498db" },
+        { type: "Organic", confidence: 88, color: "#2ecc71" },
+        { type: "Paper", confidence: 85, color: "#f39c12" },
+        { type: "Metal", confidence: 79, color: "#95a5a6" },
+        { type: "Glass", confidence: 76, color: "#1abc9c" },
+        { type: "E-Waste", confidence: 73, color: "#e74c3c" }
+      ];
       
-      setScanResult({ category: randomCategory, confidence });
-      setIsScanning(false);
+      const randomResult = wasteTypes[Math.floor(Math.random() * wasteTypes.length)];
+      setClassificationResult(randomResult.type);
+      setConfidence(randomResult.confidence);
+      setIsClassifying(false);
     }, 2000);
   };
 
-  const resetScan = () => {
-    setCapturedImage(null);
-    setScanResult(null);
-    setIsScanning(false);
+  // Reset all
+  const resetAll = () => {
+    setImagePreview(null);
+    setClassificationResult("");
+    setConfidence(0);
+    stopCamera();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm">
-            <CardHeader className="text-center pb-6">
-              <div className="mx-auto w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center mb-4">
-                <Trash2 className="h-8 w-8 text-white" />
+  // Get classification color
+  const getClassificationColor = () => {
+    const colors: { [key: string]: string } = {
+      Plastic: "#3498db",
+      Organic: "#2ecc71",
+      Paper: "#f39c12",
+      Metal: "#95a5a6",
+      Glass: "#1abc9c",
+      "E-Waste": "#e74c3c"
+    };
+    return colors[classificationResult] || "#333";
+  };
+
+  return (
+    <div className={styles.wasteClassifierContainer}>
+      <header className={styles.header}>
+        <h1>♻️ Smart Waste Segregation System</h1>
+        <p>Upload or capture waste image for automatic classification</p>
+      </header>
+
+      <div className={styles.mainContent}>
+        {/* Image Capture/Preview Section */}
+        <div className={styles.imageSection}>
+          <div className={styles.imagePreviewBox}>
+            {!isCameraActive && !imagePreview && (
+              <div className={styles.placeholder}>
+                <span className={styles.icon}>📷</span>
+                <p>No image selected</p>
+                <p className={styles.hint}>Upload or capture an image to begin</p>
               </div>
-              <CardTitle className="text-2xl font-bold text-gray-900">
-                Smart Waste Segregation
-              </CardTitle>
-              <CardDescription className="text-gray-600">
-                {activeTab === 'login' ? 'Access your dashboard' : 'Create your account'}
-              </CardDescription>
-            </CardHeader>
-            
-            <CardContent className="space-y-6">
-              {/* Tab Switcher */}
-              <div className="flex bg-gray-100 rounded-lg p-1">
-                <Button
-                  type="button"
-                  onClick={() => setActiveTab('login')}
-                  className={`flex-1 py-2 px-4 rounded-md transition-all duration-200 ${
-                    activeTab === 'login'
-                      ? 'bg-white text-emerald-600 shadow-sm font-medium'
-                      : 'bg-transparent text-gray-600 hover:text-gray-800'
-                  }`}
-                  variant="ghost"
-                >
-                  Login
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() => setActiveTab('signup')}
-                  className={`flex-1 py-2 px-4 rounded-md transition-all duration-200 ${
-                    activeTab === 'signup'
-                      ? 'bg-white text-emerald-600 shadow-sm font-medium'
-                      : 'bg-transparent text-gray-600 hover:text-gray-800'
-                  }`}
-                  variant="ghost"
-                >
-                  Sign Up
-                </Button>
+            )}
+
+            {isCameraActive && (
+              <div className={styles.cameraView}>
+                <video 
+                  ref={videoRef} 
+                  autoPlay 
+                  playsInline 
+                  muted
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover',
+                    transform: 'scaleX(-1)' // Mirror for selfie mode
+                  }}
+                />
+                <canvas ref={canvasRef} style={{ display: "none" }} />
+                <div className={styles.cameraControls}>
+                  <button className={`${styles.btn} ${styles.btnCapture}`} onClick={captureImage}>
+                    📸 Capture
+                  </button>
+                  <button className={`${styles.btn} ${styles.btnCancel}`} onClick={stopCamera}>
+                    ❌ Cancel
+                  </button>
+                </div>
               </div>
+            )}
 
-              {/* Login Form */}
-              {activeTab === 'login' && (
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-3">
-                    <Input
-                      type="text"
-                      placeholder="Username or Email"
-                      className="h-11 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
-                      required
-                    />
-                    <Input
-                      type="password"
-                      placeholder="Password"
-                      className="h-11 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
-                      required
+            {imagePreview && !isCameraActive && (
+              <div className={styles.previewImage}>
+                <img src={imagePreview} alt="Preview" />
+              </div>
+            )}
+          </div>
+
+          <div className={styles.actionButtons}>
+            <button className={`${styles.btn} ${styles.btnUpload}`} onClick={() => fileInputRef.current?.click()}>
+              📁 Upload Image
+            </button>
+            <button className={`${styles.btn} ${styles.btnCamera}`} onClick={startCamera}>
+              📷 Open Camera
+            </button>
+            <button 
+              className={`${styles.btn} ${styles.btnClassify}`}
+              onClick={classifyImage}
+              disabled={!imagePreview || isClassifying}
+            >
+              {isClassifying ? "⏳ Classifying..." : "🔍 Classify"}
+            </button>
+            <button className={`${styles.btn} ${styles.btnReset}`} onClick={resetAll}>
+              🔄 Reset
+            </button>
+          </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            style={{ display: "none" }}
+          />
+        </div>
+
+        {/* Classification Results Section */}
+        <div className={styles.classificationSection}>
+          <h2>Classification Results</h2>
+          
+          <div className={styles.resultCard}>
+            {!classificationResult ? (
+              <div className={styles.noResult}>
+                <span className={styles.icon}>🤖</span>
+                <p>Awaiting classification...</p>
+                <p className={styles.hint}>Click "Classify" button to analyze the image</p>
+              </div>
+            ) : (
+              <div className={styles.resultDetails}>
+                <div 
+                  className={styles.wasteType}
+                  style={{ borderColor: getClassificationColor() }}
+                >
+                  <h3 style={{ color: getClassificationColor() }}>
+                    {classificationResult}
+                  </h3>
+                </div>
+
+                <div className={styles.confidenceMeter}>
+                  <label>Confidence Level</label>
+                  <div className={styles.progressBar}>
+                    <div 
+                      className={styles.progressFill}
+                      style={{ 
+                        width: `${confidence}%`,
+                        backgroundColor: getClassificationColor()
+                      }}
                     />
                   </div>
+                  <span className={styles.confidenceValue}>{confidence}%</span>
+                </div>
 
-                  <div className="flex items-center justify-between text-sm">
-                    <label className="flex items-center space-x-2 text-gray-600">
-                      <input type="checkbox" className="rounded border-gray-300" />
-                      <span>Remember me</span>
-                    </label>
-                    <a href="#" className="text-emerald-600 hover:text-emerald-700">
-                      Forgot password?
-                    </a>
+                <div className={styles.disposalGuide}>
+                  <h4>Disposal Instructions:</h4>
+                  <div className={styles.guideContent}>
+                    {classificationResult === "Plastic" && (
+                      <ul>
+                        <li>♻️ Rinse and clean the plastic item</li>
+                        <li>🗑️ Place in blue recycling bin</li>
+                        <li>⚠️ Check recycling symbol for proper type</li>
+                      </ul>
+                    )}
+                    {classificationResult === "Organic" && (
+                      <ul>
+                        <li>🌱 Suitable for composting</li>
+                        <li>🗑️ Place in green organic waste bin</li>
+                        <li>🚫 Remove any packaging first</li>
+                      </ul>
+                    )}
+                    {classificationResult === "Paper" && (
+                      <ul>
+                        <li>📄 Remove any plastic coating</li>
+                        <li>🗑️ Place in blue recycling bin</li>
+                        <li>✂️ Flatten boxes to save space</li>
+                      </ul>
+                    )}
+                    {classificationResult === "Metal" && (
+                      <ul>
+                        <li>🔧 Clean and dry metal items</li>
+                        <li>🗑️ Place in designated metal recycling</li>
+                        <li>💰 Consider scrap metal collection</li>
+                      </ul>
+                    )}
+                    {classificationResult === "Glass" && (
+                      <ul>
+                        <li>🧼 Rinse glass containers</li>
+                        <li>🗑️ Place in glass recycling bin</li>
+                        <li>⚠️ Separate by color if required</li>
+                      </ul>
+                    )}
+                    {classificationResult === "E-Waste" && (
+                      <ul>
+                        <li>🔌 Remove batteries if possible</li>
+                        <li>🏢 Take to e-waste collection center</li>
+                        <li>🚫 Do not dispose in regular trash</li>
+                      </ul>
+                    )}
                   </div>
+                </div>
 
-                  <Button 
-                    type="submit" 
-                    className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
-                  >
-                    Sign In
-                  </Button>
-                </form>
-              )}
+                <div className={styles.binIndicator}>
+                  <span className={styles.binIcon}>🗑️</span>
+                  <p>
+                    Dispose in: <strong style={{ color: getClassificationColor() }}>
+                      {classificationResult} Waste Bin
+                    </strong>
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
 
-              {/* Signup Form */}
-              {activeTab === 'signup' && (
-                <form onSubmit={handleSignup} className="space-y-4">
-                  <div className="space-y-3">
-                    <Input
-                      type="text"
-                      placeholder="Full Name"
-                      className="h-11 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
-                      required
-                    />
-                    <Input
-                      type="email"
-                      placeholder="Email Address"
-                      className="h-11 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
-                      required
-                    />
-                    <Input
-                      type="password"
-                      placeholder="Password"
-                      className="h-11 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
-                      required
-                    />
-                    <Input
-                      type="password"
-                      placeholder="Confirm Password"
-                      className="h-11 border-gray-200 focus:border-emerald-500 focus:ring-emerald-500"
-                      required
-                    />
-                  </div>
-
-                  <div className="flex items-start space-x-2 text-sm text-gray-600">
-                    <input type="checkbox" className="rounded border-gray-300 mt-0.5" required />
-                    <span>
-                      I agree to the{' '}
-                      <a href="#" className="text-emerald-600 hover:text-emerald-700">
-                        Terms of Service
-                      </a>{' '}
-                      and{' '}
-                      <a href="#" className="text-emerald-600 hover:text-emerald-700">
-                        Privacy Policy
-                      </a>
-                    </span>
-                  </div>
-
-                  <Button 
-                    type="submit" 
-                    className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-medium"
-                  >
-                    Create Account
-                  </Button>
-                </form>
-              )}
-            </CardContent>
-          </Card>
-
-          <div className="text-center mt-6">
-            <p className="text-sm text-gray-600">
-              {activeTab === 'login' ? "Don't have an account? " : "Already have an account? "}
-              <button
-                onClick={() => setActiveTab(activeTab === 'login' ? 'signup' : 'login')}
-                className="text-emerald-600 hover:text-emerald-700 font-medium"
-              >
-                {activeTab === 'login' ? 'Sign up here' : 'Sign in here'}
-              </button>
-            </p>
+          <div className={styles.wasteCategories}>
+            <h3>Waste Categories</h3>
+            <div className={styles.categoryGrid}>
+              <div className={styles.categoryItem} style={{ borderLeftColor: "#3498db" }}>
+                <span>Plastic</span>
+              </div>
+              <div className={styles.categoryItem} style={{ borderLeftColor: "#2ecc71" }}>
+                <span>Organic</span>
+              </div>
+              <div className={styles.categoryItem} style={{ borderLeftColor: "#f39c12" }}>
+                <span>Paper</span>
+              </div>
+              <div className={styles.categoryItem} style={{ borderLeftColor: "#95a5a6" }}>
+                <span>Metal</span>
+              </div>
+              <div className={styles.categoryItem} style={{ borderLeftColor: "#1abc9c" }}>
+                <span>Glass</span>
+              </div>
+              <div className={styles.categoryItem} style={{ borderLeftColor: "#e74c3c" }}>
+                <span>E-Waste</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Top Navigation */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mr-4">
-                <User className="h-6 w-6 text-gray-600" />
-              </div>
-              <span className="text-sm text-gray-600">Guest User is not upgradable</span>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <Badge variant="secondary" className="bg-emerald-100 text-emerald-800">Admin Login</Badge>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="hover:bg-gray-50"
-                onClick={() => setIsLoggedIn(false)}
-              >
-                Logout
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Smart Waste Segregation System</h1>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Camera Section */}
-          <div className="lg:col-span-2">
-            <Card className="border-0 shadow-lg h-full">
-              <CardContent className="p-8">
-                <div className="text-center">
-                  {!capturedImage ? (
-                    <div className="space-y-6">
-                      <div className="w-80 h-80 mx-auto border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center bg-gray-50">
-                        {videoRef.current?.srcObject ? (
-                          <video
-                            ref={videoRef}
-                            autoPlay
-                            playsInline
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        ) : (
-                          <div className="text-center">
-                            <Camera className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                            <p className="text-lg text-gray-600 font-medium">Camera to capture</p>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="space-x-4">
-                        {!videoRef.current?.srcObject ? (
-                          <Button 
-                            onClick={startCamera}
-                            className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white"
-                          >
-                            Start Camera
-                          </Button>
-                        ) : (
-                          <Button 
-                            onClick={captureImage}
-                            className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white"
-                          >
-                            Capture Image
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      <div className="w-80 h-80 mx-auto rounded-lg overflow-hidden border-2 border-gray-200">
-                        <img 
-                          src={capturedImage} 
-                          alt="Captured waste" 
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      
-                      <div className="space-x-4">
-                        <Button 
-                          onClick={scanNow}
-                          disabled={isScanning}
-                          className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white disabled:bg-emerald-400"
-                        >
-                          {isScanning ? 'Scanning...' : 'Scan Now'}
-                        </Button>
-                        <Button 
-                          onClick={resetScan}
-                          variant="outline"
-                          className="px-8 py-3"
-                        >
-                          Reset
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Results Section */}
-          <div>
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="text-center">
-                <CardTitle className="text-xl font-bold text-gray-900">Result</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Image Preview */}
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2 text-center">Image</h3>
-                  <div className="w-full h-32 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
-                    {capturedImage ? (
-                      <img 
-                        src={capturedImage} 
-                        alt="Preview" 
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    ) : (
-                      <span className="text-gray-400 text-sm">No image captured</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Category Result */}
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2 text-center">Category</h3>
-                  <div className="w-full h-32 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
-                    {isScanning ? (
-                      <div className="text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-2"></div>
-                        <span className="text-gray-600 text-sm">Analyzing...</span>
-                      </div>
-                    ) : scanResult ? (
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-emerald-600 mb-1">{scanResult.category}</div>
-                        {scanResult.confidence && (
-                          <div className="text-sm text-gray-500">{scanResult.confidence}% confidence</div>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-gray-400 text-sm">Scan an image to see results</span>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </main>
-
-      {/* Hidden canvas for image capture */}
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
     </div>
   );
-}
+};
+
+export default WasteClassifier;
