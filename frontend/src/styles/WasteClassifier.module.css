@@ -1,0 +1,413 @@
+.wasteClassifierContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  color: white;
+  margin-bottom: 40px;
+  padding: 20px;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  margin: 0 0 10px 0;
+}
+
+.header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.mainContent {
+  display: flex;
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+/* Image Section */
+.imageSection {
+  flex: 1;
+  min-width: 300px;
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.imagePreviewBox {
+  width: 100%;
+  height: 400px;
+  border: 3px dashed #ccc;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: #f8f9fa;
+}
+
+.placeholder {
+  text-align: center;
+  color: #999;
+}
+
+.placeholder .icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.placeholder p {
+  font-size: 1.1rem;
+  margin: 5px 0;
+}
+
+.placeholder .hint {
+  font-size: 0.9rem;
+  color: #bbb;
+}
+
+.icon {
+  font-style: normal;
+}
+
+.hint {
+  opacity: 0.7;
+}
+
+.cameraView {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cameraView video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cameraControls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.previewImage {
+  width: 100%;
+  height: 100%;
+}
+
+.previewImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.actionButtons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.btn {
+  padding: 14px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnUpload {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.btnCamera {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+  color: white;
+}
+
+.btnClassify {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+}
+
+.btnReset {
+  background: #6c757d;
+  color: white;
+}
+
+.btnCapture {
+  background: #28a745;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnCancel {
+  background: #dc3545;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:not(:disabled):hover,
+.btnCapture:hover,
+.btnCancel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Classification Section */
+.classificationSection {
+  flex: 1;
+  min-width: 300px;
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.classificationSection h2 {
+  color: #333;
+  margin: 0 0 20px 0;
+  font-size: 1.8rem;
+}
+
+.resultCard {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 25px;
+  margin-bottom: 25px;
+  min-height: 300px;
+}
+
+.noResult {
+  text-align: center;
+  padding: 40px 0;
+  color: #999;
+}
+
+.noResult .icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.noResult p {
+  font-size: 1.1rem;
+  margin: 5px 0;
+}
+
+.noResult .hint {
+  font-size: 0.9rem;
+  color: #bbb;
+}
+
+.resultDetails {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wasteType {
+  text-align: center;
+  padding: 20px;
+  border: 3px solid;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  background: white;
+}
+
+.wasteType h3 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.confidenceMeter {
+  margin-bottom: 25px;
+}
+
+.confidenceMeter label {
+  display: block;
+  margin-bottom: 10px;
+  color: #555;
+  font-weight: 600;
+}
+
+.progressBar {
+  width: 100%;
+  height: 30px;
+  background: #e0e0e0;
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progressFill {
+  height: 100%;
+  transition: width 1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+  color: white;
+  font-weight: bold;
+}
+
+.confidenceValue {
+  display: block;
+  text-align: right;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.disposalGuide {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.disposalGuide h4 {
+  color: #333;
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+}
+
+.guideContent ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.guideContent li {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  color: #555;
+  line-height: 1.6;
+}
+
+.guideContent li:last-child {
+  border-bottom: none;
+}
+
+.binIndicator {
+  text-align: center;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+}
+
+.binIcon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.binIndicator p {
+  font-size: 1.1rem;
+  color: #555;
+  margin: 0;
+}
+
+.binIndicator strong {
+  font-size: 1.3rem;
+}
+
+.wasteCategories {
+  margin-top: 25px;
+}
+
+.wasteCategories h3 {
+  color: #333;
+  margin: 0 0 15px 0;
+  font-size: 1.3rem;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.categoryItem {
+  padding: 15px;
+  background: #f8f9fa;
+  border-left: 4px solid;
+  border-radius: 5px;
+  font-weight: 600;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.categoryItem span {
+  display: block;
+}
+
+.categoryItem:hover {
+  transform: translateX(5px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .mainContent {
+    flex-direction: column;
+  }
+
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .actionButtons {
+    grid-template-columns: 1fr;
+  }
+
+  .categoryGrid {
+    grid-template-columns: 1fr;
+  }
+}
