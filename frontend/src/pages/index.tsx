@@ -78,7 +78,7 @@ const WasteClassifier: React.FC = () => {
     }
   };
 
-  // Classify image (mock classification - replace with actual API call)
+  // Classify image - Replace with actual ML model API call
   const classifyImage = async () => {
     if (!imagePreview) {
       alert("Please upload or capture an image first!");
@@ -87,22 +87,42 @@ const WasteClassifier: React.FC = () => {
 
     setIsClassifying(true);
     
-    // Simulate API call - Replace with your actual classification API
-    setTimeout(() => {
-      const wasteTypes = [
-        { type: "Plastic", confidence: 92, color: "#3498db" },
-        { type: "Organic", confidence: 88, color: "#2ecc71" },
-        { type: "Paper", confidence: 85, color: "#f39c12" },
-        { type: "Metal", confidence: 79, color: "#95a5a6" },
-        { type: "Glass", confidence: 76, color: "#1abc9c" },
-        { type: "E-Waste", confidence: 73, color: "#e74c3c" }
-      ];
+    try {
+      // TODO: Replace this with your actual ML model API endpoint
+      // Example API call structure:
+      /*
+      const formData = new FormData();
+      formData.append('image', imagePreview);
       
-      const randomResult = wasteTypes[Math.floor(Math.random() * wasteTypes.length)];
-      setClassificationResult(randomResult.type);
-      setConfidence(randomResult.confidence);
+      const response = await fetch('YOUR_ML_API_ENDPOINT', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      setClassificationResult(data.category); // Should be: Paper, Plastic, Metal, or Other
+      setConfidence(data.confidence); // Should be percentage (0-100)
+      */
+      
+      // Mock classification for testing - Remove this when integrating ML model
+      setTimeout(() => {
+        const wasteTypes = [
+          { type: "Paper", confidence: 92 },
+          { type: "Plastic", confidence: 88 },
+          { type: "Metal", confidence: 85 },
+          { type: "Other", confidence: 79 }
+        ];
+        
+        const randomResult = wasteTypes[Math.floor(Math.random() * wasteTypes.length)];
+        setClassificationResult(randomResult.type);
+        setConfidence(randomResult.confidence);
+        setIsClassifying(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Classification error:", error);
+      alert("Error classifying image. Please try again.");
       setIsClassifying(false);
-    }, 2000);
+    }
   };
 
   // Reset all
@@ -119,12 +139,10 @@ const WasteClassifier: React.FC = () => {
   // Get classification color
   const getClassificationColor = () => {
     const colors: { [key: string]: string } = {
-      Plastic: "#3498db",
-      Organic: "#2ecc71",
       Paper: "#f39c12",
+      Plastic: "#3498db",
       Metal: "#95a5a6",
-      Glass: "#1abc9c",
-      "E-Waste": "#e74c3c"
+      Other: "#e74c3c"
     };
     return colors[classificationResult] || "#333";
   };
@@ -248,46 +266,36 @@ const WasteClassifier: React.FC = () => {
                 <div className={styles.disposalGuide}>
                   <h4>Disposal Instructions:</h4>
                   <div className={styles.guideContent}>
+                    {classificationResult === "Paper" && (
+                      <ul>
+                        <li>📄 Remove any plastic coating or tape</li>
+                        <li>🗑️ Place in blue recycling bin</li>
+                        <li>✂️ Flatten boxes to save space</li>
+                        <li>🚫 Keep dry - wet paper is not recyclable</li>
+                      </ul>
+                    )}
                     {classificationResult === "Plastic" && (
                       <ul>
                         <li>♻️ Rinse and clean the plastic item</li>
-                        <li>🗑️ Place in blue recycling bin</li>
-                        <li>⚠️ Check recycling symbol for proper type</li>
-                      </ul>
-                    )}
-                    {classificationResult === "Organic" && (
-                      <ul>
-                        <li>🌱 Suitable for composting</li>
-                        <li>🗑️ Place in green organic waste bin</li>
-                        <li>🚫 Remove any packaging first</li>
-                      </ul>
-                    )}
-                    {classificationResult === "Paper" && (
-                      <ul>
-                        <li>📄 Remove any plastic coating</li>
-                        <li>🗑️ Place in blue recycling bin</li>
-                        <li>✂️ Flatten boxes to save space</li>
+                        <li>🗑️ Place in designated plastic recycling bin</li>
+                        <li>⚠️ Check recycling symbol (1-7) for proper type</li>
+                        <li>🧴 Remove caps and labels if possible</li>
                       </ul>
                     )}
                     {classificationResult === "Metal" && (
                       <ul>
                         <li>🔧 Clean and dry metal items</li>
-                        <li>🗑️ Place in designated metal recycling</li>
-                        <li>💰 Consider scrap metal collection</li>
+                        <li>🗑️ Place in metal recycling bin</li>
+                        <li>💰 Consider scrap metal collection for large items</li>
+                        <li>🥫 Aluminum cans should be crushed to save space</li>
                       </ul>
                     )}
-                    {classificationResult === "Glass" && (
+                    {classificationResult === "Other" && (
                       <ul>
-                        <li>🧼 Rinse glass containers</li>
-                        <li>🗑️ Place in glass recycling bin</li>
-                        <li>⚠️ Separate by color if required</li>
-                      </ul>
-                    )}
-                    {classificationResult === "E-Waste" && (
-                      <ul>
-                        <li>🔌 Remove batteries if possible</li>
-                        <li>🏢 Take to e-waste collection center</li>
-                        <li>🚫 Do not dispose in regular trash</li>
+                        <li>🗑️ Place in general waste bin</li>
+                        <li>⚠️ Check if item can be repaired or donated</li>
+                        <li>🏢 Consider special disposal for hazardous items</li>
+                        <li>🚫 Do not mix with recyclable materials</li>
                       </ul>
                     )}
                   </div>
@@ -308,23 +316,17 @@ const WasteClassifier: React.FC = () => {
           <div className={styles.wasteCategories}>
             <h3>Waste Categories</h3>
             <div className={styles.categoryGrid}>
-              <div className={styles.categoryItem} style={{ borderLeftColor: "#3498db" }}>
-                <span>Plastic</span>
-              </div>
-              <div className={styles.categoryItem} style={{ borderLeftColor: "#2ecc71" }}>
-                <span>Organic</span>
-              </div>
               <div className={styles.categoryItem} style={{ borderLeftColor: "#f39c12" }}>
-                <span>Paper</span>
+                <span>📄 Paper</span>
+              </div>
+              <div className={styles.categoryItem} style={{ borderLeftColor: "#3498db" }}>
+                <span>♻️ Plastic</span>
               </div>
               <div className={styles.categoryItem} style={{ borderLeftColor: "#95a5a6" }}>
-                <span>Metal</span>
-              </div>
-              <div className={styles.categoryItem} style={{ borderLeftColor: "#1abc9c" }}>
-                <span>Glass</span>
+                <span>🔧 Metal</span>
               </div>
               <div className={styles.categoryItem} style={{ borderLeftColor: "#e74c3c" }}>
-                <span>E-Waste</span>
+                <span>🗑️ Other</span>
               </div>
             </div>
           </div>

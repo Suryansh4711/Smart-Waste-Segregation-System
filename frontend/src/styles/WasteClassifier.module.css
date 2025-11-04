@@ -371,17 +371,19 @@
 .categoryGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 15px;
 }
 
 .categoryItem {
-  padding: 15px;
+  padding: 20px 15px;
   background: #f8f9fa;
-  border-left: 4px solid;
-  border-radius: 5px;
+  border-left: 5px solid;
+  border-radius: 8px;
   font-weight: 600;
+  font-size: 1.1rem;
   color: #333;
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 .categoryItem span {
