@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+pydantic
+python-multipart
+tensorflow  # or tensorflow-cpu
+Pillow        # PIL for image handling
+numpy

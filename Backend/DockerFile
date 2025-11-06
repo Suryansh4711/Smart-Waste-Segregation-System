@@ -1,0 +1,29 @@
+# Use a Python base image
+FROM python:3.10-slim
+
+# Set environment variables for the application
+ENV PYTHONUNBUFFERED 1
+ENV PORT 8000
+
+# Set the working directory
+WORKDIR /app
+
+# Copy dependency files and install them
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Create a directory for the model and copy the model file
+RUN mkdir -p /app/models
+# NOTE: Replace with your actual model file name
+COPY models/resnet50_waste_classifier.h5 /app/models/
+ENV ML_MODEL_PATH="/app/models/resnet50_waste_classifier.h5"
+
+# Copy the rest of the application code
+COPY . /app
+
+# Expose the port
+EXPOSE 8000
+
+# Command to run the application using Uvicorn
+# The command starts the server pointing to the 'app' object in 'main.py'
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
