@@ -1,0 +1,86 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*,cover
+
+# Static type checkers
+.mypy_cache/
+.pyre/
+
+# Virtualenv / env files
+.env
+.env.*
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+.DS_Store
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite3
+
+# Jupyter
+.ipynb_checkpoints
+
+# Model artifacts / large files
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.onnx
+models/
+model_weights/
+weights/
+
+# Node modules (if any tooling is present)
+node_modules/
+
+# Misc temp files
+*.bak
+*.swp
+
