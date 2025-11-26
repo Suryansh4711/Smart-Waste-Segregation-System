@@ -4,12 +4,13 @@ import numpy as np
 from PIL import Image
 import tensorflow as tf
 import uvicorn
+from tensorflow.keras.applications.efficientnet import preprocess_input
 
 MODEL_PATH = "waste_model.h5"
 IMG_SIZE = 224
 
 model = tf.keras.models.load_model(MODEL_PATH)
-CLASS_NAMES = ["bio-degradable", "non-biodegradable", "other"]
+CLASS_NAMES = ["bio-degradable", "non-biodegradable"]
 
 app = FastAPI()
 
@@ -20,9 +21,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 def preprocess(image):
     image = image.resize((IMG_SIZE, IMG_SIZE))
-    image = np.array(image) / 255.0
+    image = np.array(image)
+    image = preprocess_input(image)
     image = np.expand_dims(image, axis=0)
     return image
 
