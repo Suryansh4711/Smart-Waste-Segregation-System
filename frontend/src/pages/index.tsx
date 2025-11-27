@@ -1,334 +1,215 @@
-import React, { useState, useRef } from "react";
-import styles from "../styles/WasteClassifier.module.css";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useNavigate } from "react-router-dom";
+import { Recycle, Leaf, ArrowRight, Upload, Sparkles, CheckCircle2, X } from "lucide-react";
+import heroImage from "@/assets/hero-waste-illustration.png";
 
-const WasteClassifier: React.FC = () => {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [classificationResult, setClassificationResult] = useState<string>("");
-  const [confidence, setConfidence] = useState<number>(0);
-  const [isClassifying, setIsClassifying] = useState<boolean>(false);
-  const [isCameraActive, setIsCameraActive] = useState<boolean>(false);
-  
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  // Handle file upload
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-        setClassificationResult("");
-        setConfidence(0);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Start camera
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          facingMode: "environment",
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        } 
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.muted = true;
-        videoRef.current.playsInline = true;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play();
-        };
-        setIsCameraActive(true);
-      }
-    } catch (error) {
-      console.error("Error accessing camera:", error);
-      alert("Could not access camera. Please check permissions.");
-    }
-  };
-
-  // Capture image from camera
-  const captureImage = () => {
-    if (videoRef.current && canvasRef.current) {
-      const context = canvasRef.current.getContext("2d");
-      if (context) {
-        canvasRef.current.width = videoRef.current.videoWidth;
-        canvasRef.current.height = videoRef.current.videoHeight;
-        context.drawImage(videoRef.current, 0, 0);
-        
-        const imageDataUrl = canvasRef.current.toDataURL("image/png");
-        setImagePreview(imageDataUrl);
-        stopCamera();
-        setClassificationResult("");
-        setConfidence(0);
-      }
-    }
-  };
-
-  // Stop camera
-  const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach(track => track.stop());
-      setIsCameraActive(false);
-    }
-  };
-
-  // Classify image - Replace with actual ML model API call
-  const classifyImage = async () => {
-    if (!imagePreview) {
-      alert("Please upload or capture an image first!");
-      return;
-    }
-
-    setIsClassifying(true);
-    
-    try {
-      // TODO: Replace this with your actual ML model API endpoint
-      // Example API call structure:
-      /*
-      const formData = new FormData();
-      formData.append('image', imagePreview);
-      
-      const response = await fetch('YOUR_ML_API_ENDPOINT', {
-        method: 'POST',
-        body: formData
-      });
-      
-      const data = await response.json();
-      setClassificationResult(data.category); // Should be: Paper, Plastic, Metal, or Other
-      setConfidence(data.confidence); // Should be percentage (0-100)
-      */
-      
-      // Mock classification for testing - Remove this when integrating ML model
-      setTimeout(() => {
-        const wasteTypes = [
-          { type: "Paper", confidence: 92 },
-          { type: "Plastic", confidence: 88 },
-          { type: "Metal", confidence: 85 },
-          { type: "Other", confidence: 79 }
-        ];
-        
-        const randomResult = wasteTypes[Math.floor(Math.random() * wasteTypes.length)];
-        setClassificationResult(randomResult.type);
-        setConfidence(randomResult.confidence);
-        setIsClassifying(false);
-      }, 2000);
-    } catch (error) {
-      console.error("Classification error:", error);
-      alert("Error classifying image. Please try again.");
-      setIsClassifying(false);
-    }
-  };
-
-  // Reset all
-  const resetAll = () => {
-    setImagePreview(null);
-    setClassificationResult("");
-    setConfidence(0);
-    stopCamera();
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  // Get classification color
-  const getClassificationColor = () => {
-    const colors: { [key: string]: string } = {
-      Paper: "#f39c12",
-      Plastic: "#3498db",
-      Metal: "#95a5a6",
-      Other: "#e74c3c"
-    };
-    return colors[classificationResult] || "#333";
-  };
+const Index = () => {
+  const navigate = useNavigate();
+  const [showLearnMore, setShowLearnMore] = useState(false);
 
   return (
-    <div className={styles.wasteClassifierContainer}>
-      <header className={styles.header}>
-        <h1>♻️ Smart Waste Segregation System</h1>
-        <p>Upload or capture waste image for automatic classification</p>
-      </header>
-
-      <div className={styles.mainContent}>
-        {/* Image Capture/Preview Section */}
-        <div className={styles.imageSection}>
-          <div className={styles.imagePreviewBox}>
-            {!isCameraActive && !imagePreview && (
-              <div className={styles.placeholder}>
-                <span className={styles.icon}>📷</span>
-                <p>No image selected</p>
-                <p className={styles.hint}>Upload or capture an image to begin</p>
-              </div>
-            )}
-
-            {isCameraActive && (
-              <div className={styles.cameraView}>
-                <video 
-                  ref={videoRef} 
-                  autoPlay 
-                  playsInline 
-                  muted
-                  className={styles.videoElement}
-                />
-                <canvas ref={canvasRef} style={{ display: "none" }} />
-                <div className={styles.cameraControls}>
-                  <button className={`${styles.btn} ${styles.btnCapture}`} onClick={captureImage}>
-                    📸 Capture
-                  </button>
-                  <button className={`${styles.btn} ${styles.btnCancel}`} onClick={stopCamera}>
-                    ❌ Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {imagePreview && !isCameraActive && (
-              <div className={styles.previewImage}>
-                <img src={imagePreview} alt="Preview" />
-              </div>
-            )}
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center">
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-4xl mx-auto text-center space-y-12 animate-fade-in">
+          {/* Centered Illustration */}
+          <div className="relative inline-block animate-scale-in" style={{ animationDelay: "0.2s" }}>
+            <div className="absolute inset-0 bg-gradient-hero blur-3xl opacity-30 rounded-full animate-pulse" />
+            <img
+              src={heroImage}
+              alt="Smart Waste Segregation - Eco-friendly recycling illustration"
+              className="relative rounded-3xl shadow-hover w-full max-w-2xl mx-auto hover:scale-105 transition-transform duration-500"
+            />
           </div>
 
-          <div className={styles.actionButtons}>
-            <button className={`${styles.btn} ${styles.btnUpload}`} onClick={() => fileInputRef.current?.click()}>
-              📁 Upload Image
-            </button>
-            <button className={`${styles.btn} ${styles.btnCamera}`} onClick={startCamera}>
-              📷 Open Camera
-            </button>
-            <button 
-              className={`${styles.btn} ${styles.btnClassify}`}
-              onClick={classifyImage}
-              disabled={!imagePreview || isClassifying}
+          {/* Title */}
+          <div className="space-y-6 animate-fade-in" style={{ animationDelay: "0.4s" }}>
+            <div className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 rounded-full shadow-soft">
+              <Leaf className="h-5 w-5 text-primary animate-pulse" />
+              <span className="text-sm font-semibold text-primary">
+                AI-Powered Eco Solution
+              </span>
+            </div>
+
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight">
+              Welcome to our{" "}
+              <span className="text-primary bg-gradient-hero bg-clip-text">
+                Smart Waste Segregation System
+              </span>
+            </h1>
+
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Harness the power of artificial intelligence to identify and properly categorize waste. 
+              Make recycling effortless and contribute to a sustainable future.
+            </p>
+          </div>
+
+          {/* Call to Action */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: "0.6s" }}>
+            <Button
+              onClick={() => navigate("/classifier")}
+              size="lg"
+              className="shadow-hover hover:shadow-soft transition-all duration-300 hover:scale-105 group text-lg px-8 py-6 h-auto"
             >
-              {isClassifying ? "⏳ Classifying..." : "🔍 Classify"}
-            </button>
-            <button className={`${styles.btn} ${styles.btnReset}`} onClick={resetAll}>
-              🔄 Reset
-            </button>
+              Get Started
+              <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform duration-300" />
+            </Button>
+            <Button
+              onClick={() => setShowLearnMore(true)}
+              variant="outline"
+              size="lg"
+              className="shadow-soft hover:shadow-hover transition-all duration-300 hover:scale-105 text-lg px-8 py-6 h-auto"
+            >
+              <Recycle className="mr-2 h-6 w-6" />
+              Learn More
+            </Button>
           </div>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            style={{ display: "none" }}
-          />
-        </div>
-
-        {/* Classification Results Section */}
-        <div className={styles.classificationSection}>
-          <h2>Classification Results</h2>
-          
-          <div className={styles.resultCard}>
-            {!classificationResult ? (
-              <div className={styles.noResult}>
-                <span className={styles.icon}>🤖</span>
-                <p>Awaiting classification...</p>
-                <p className={styles.hint}>Click "Classify" button to analyze the image</p>
-              </div>
-            ) : (
-              <div className={styles.resultDetails}>
-                <div 
-                  className={styles.wasteType}
-                  style={{ borderColor: getClassificationColor() }}
-                >
-                  <h3 style={{ color: getClassificationColor() }}>
-                    {classificationResult}
-                  </h3>
-                </div>
-
-                <div className={styles.confidenceMeter}>
-                  <label>Confidence Level</label>
-                  <div className={styles.progressBar}>
-                    <div 
-                      className={styles.progressFill}
-                      style={{ 
-                        width: `${confidence}%`,
-                        backgroundColor: getClassificationColor()
-                      }}
-                    />
-                  </div>
-                  <span className={styles.confidenceValue}>{confidence}%</span>
-                </div>
-
-                <div className={styles.disposalGuide}>
-                  <h4>Disposal Instructions:</h4>
-                  <div className={styles.guideContent}>
-                    {classificationResult === "Paper" && (
-                      <ul>
-                        <li>📄 Remove any plastic coating or tape</li>
-                        <li>🗑️ Place in blue recycling bin</li>
-                        <li>✂️ Flatten boxes to save space</li>
-                        <li>🚫 Keep dry - wet paper is not recyclable</li>
-                      </ul>
-                    )}
-                    {classificationResult === "Plastic" && (
-                      <ul>
-                        <li>♻️ Rinse and clean the plastic item</li>
-                        <li>🗑️ Place in designated plastic recycling bin</li>
-                        <li>⚠️ Check recycling symbol (1-7) for proper type</li>
-                        <li>🧴 Remove caps and labels if possible</li>
-                      </ul>
-                    )}
-                    {classificationResult === "Metal" && (
-                      <ul>
-                        <li>🔧 Clean and dry metal items</li>
-                        <li>🗑️ Place in metal recycling bin</li>
-                        <li>💰 Consider scrap metal collection for large items</li>
-                        <li>🥫 Aluminum cans should be crushed to save space</li>
-                      </ul>
-                    )}
-                    {classificationResult === "Other" && (
-                      <ul>
-                        <li>🗑️ Place in general waste bin</li>
-                        <li>⚠️ Check if item can be repaired or donated</li>
-                        <li>🏢 Consider special disposal for hazardous items</li>
-                        <li>🚫 Do not mix with recyclable materials</li>
-                      </ul>
-                    )}
-                  </div>
-                </div>
-
-                <div className={styles.binIndicator}>
-                  <span className={styles.binIcon}>🗑️</span>
-                  <p>
-                    Dispose in: <strong style={{ color: getClassificationColor() }}>
-                      {classificationResult} Waste Bin
-                    </strong>
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className={styles.wasteCategories}>
-            <h3>Waste Categories</h3>
-            <div className={styles.categoryGrid}>
-              <div className={styles.categoryItem} style={{ borderLeftColor: "#f39c12" }}>
-                <span>📄 Paper</span>
-              </div>
-              <div className={styles.categoryItem} style={{ borderLeftColor: "#3498db" }}>
-                <span>♻️ Plastic</span>
-              </div>
-              <div className={styles.categoryItem} style={{ borderLeftColor: "#95a5a6" }}>
-                <span>🔧 Metal</span>
-              </div>
-              <div className={styles.categoryItem} style={{ borderLeftColor: "#e74c3c" }}>
-                <span>🗑️ Other</span>
-              </div>
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-8 pt-12 max-w-3xl mx-auto animate-fade-in" style={{ animationDelay: "0.8s" }}>
+            <div className="text-center p-6 rounded-2xl bg-card/50 backdrop-blur-sm shadow-soft hover:shadow-hover transition-all duration-300 hover:scale-105">
+              <p className="text-4xl md:text-5xl font-bold text-primary mb-2">95%</p>
+              <p className="text-sm md:text-base text-muted-foreground">Accuracy</p>
+            </div>
+            <div className="text-center p-6 rounded-2xl bg-card/50 backdrop-blur-sm shadow-soft hover:shadow-hover transition-all duration-300 hover:scale-105">
+              <p className="text-4xl md:text-5xl font-bold text-primary mb-2">2</p>
+              <p className="text-sm md:text-base text-muted-foreground">Categories</p>
+            </div>
+            <div className="text-center p-6 rounded-2xl bg-card/50 backdrop-blur-sm shadow-soft hover:shadow-hover transition-all duration-300 hover:scale-105">
+              <p className="text-4xl md:text-5xl font-bold text-primary mb-2">Fast</p>
+              <p className="text-sm md:text-base text-muted-foreground">Results</p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Learn More Dialog */}
+      <Dialog open={showLearnMore} onOpenChange={setShowLearnMore}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto animate-scale-in">
+          <DialogHeader>
+            <DialogTitle className="text-3xl font-bold text-center mb-4 text-primary">
+              How It Works
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-8 py-4">
+            {/* What We Do */}
+            <div className="space-y-4 animate-fade-in">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-full bg-primary/10">
+                  <Leaf className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">What We Do</h3>
+              </div>
+              <p className="text-muted-foreground leading-relaxed pl-12">
+                Our Smart Waste Segregation System uses advanced AI technology to help you identify and properly categorize waste items. Simply upload an image, and our system will instantly tell you whether the item is biodegradable or non-biodegradable.
+              </p>
+            </div>
+
+            {/* Understanding Categories */}
+            <div className="space-y-4 animate-fade-in" style={{ animationDelay: "0.1s" }}>
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-full bg-primary/10">
+                  <Recycle className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">Waste Categories</h3>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4 pl-12">
+                <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
+                  <h4 className="font-semibold text-primary mb-2 flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5" />
+                    Biodegradable
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Organic waste that decomposes naturally - food scraps, paper, leaves, and plant materials.
+                  </p>
+                </div>
+                <div className="p-4 rounded-xl bg-destructive/5 border border-destructive/20">
+                  <h4 className="font-semibold text-destructive mb-2 flex items-center gap-2">
+                    <X className="h-5 w-5" />
+                    Non-Biodegradable
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Materials that don't break down easily - plastics, metals, glass, and synthetic items requiring special disposal.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* How to Use */}
+            <div className="space-y-4 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-full bg-primary/10">
+                  <Sparkles className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground">Simple 3-Step Process</h3>
+              </div>
+              <div className="space-y-3 pl-12">
+                <div className="flex items-start gap-4 p-4 rounded-xl bg-card hover:shadow-soft transition-all duration-300">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                    1
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1 flex items-center gap-2">
+                      <Upload className="h-4 w-4" />
+                      Upload Image
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      Take a photo or upload an image of your waste item
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4 p-4 rounded-xl bg-card hover:shadow-soft transition-all duration-300">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1 flex items-center gap-2">
+                      <Sparkles className="h-4 w-4" />
+                      Click Predict
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      Let our AI analyze the image and classify the waste type
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4 p-4 rounded-xl bg-card hover:shadow-soft transition-all duration-300">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                    3
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1 flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4" />
+                      Get Results
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      Receive instant classification and proper disposal guidance
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Call to Action */}
+            <div className="pt-4 text-center animate-fade-in" style={{ animationDelay: "0.3s" }}>
+              <Button 
+                onClick={() => {
+                  setShowLearnMore(false);
+                  navigate("/classifier");
+                }}
+                size="lg"
+                className="shadow-hover hover:shadow-soft transition-all duration-300 hover:scale-105 text-lg px-10 py-6 h-auto"
+              >
+                Try It Now
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
-export default WasteClassifier;
+export default Index;
