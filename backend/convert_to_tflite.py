@@ -1,22 +1,27 @@
 import tensorflow as tf
-import os
-
-# Disable broken MLIR optimizer on Apple Silicon
-os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 print("Loading SavedModel...")
-converter = tf.lite.TFLiteConverter.from_saved_model("saved_model")
 
-# Most important: disable the new converter
-converter.experimental_new_converter = False
+# Force CPU mode to avoid Metal seed/resource issues
+with tf.device("/CPU:0"):
+    model = tf.saved_model.load("saved_model")
+    concrete_func = model.signatures["serving_default"]
+
+print("Converting to TFLite...")
+
+# Correct converter with trackable_obj
+converter = tf.lite.TFLiteConverter.from_concrete_functions(
+    [concrete_func],
+    trackable_obj=model
+)
 
 # Optional optimizations
 converter.optimizations = [tf.lite.Optimize.DEFAULT]
 
-print("Converting...")
 tflite_model = converter.convert()
 
+# Save file
 with open("waste_model.tflite", "wb") as f:
     f.write(tflite_model)
 
-print("SUCCESS: waste_model.tflite saved")
+print("✔ Successfully saved waste_model.tflite")
