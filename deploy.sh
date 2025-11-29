@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-PROJECT_ID="your-gcp-project-id"
+PROJECT_ID="project-68363eca-09e7-4d29-a4d"
 REGION="us-central1"
 BACKEND_SERVICE="waste-backend"
 FRONTEND_SERVICE="waste-frontend"
@@ -15,13 +15,11 @@ echo "🚀 Starting deployment to GCP Cloud Run..."
 echo "Project ID: $PROJECT_ID"
 echo "Region: $REGION"
 
-# Check if gcloud is installed
 if ! command -v gcloud &> /dev/null; then
     echo "❌ gcloud CLI is not installed. Please install it first."
     exit 1
 fi
 
-# Set the project
 echo "📋 Setting GCP project..."
 gcloud config set project $PROJECT_ID
 
