@@ -5,8 +5,11 @@ from PIL import Image
 import tensorflow as tf
 import uvicorn
 from tensorflow.keras.applications.efficientnet import preprocess_input
+import os
 
-MODEL_PATH = "waste_model.h5"
+# Get the absolute path to the model file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "waste_model.h5")
 IMG_SIZE = 224
 
 model = tf.keras.models.load_model(MODEL_PATH)
