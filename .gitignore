@@ -128,14 +128,14 @@ lerna-debug.log*
 *.sqlite3
 *.db
 
-# Machine Learning Models & Large Files
-*.h5
+# Machine Learning Models & Large Files (except project models)
+# *.h5
+# *.tflite
 *.hdf5
 *.pt
 *.pth
 *.onnx
 *.pb
-*.tflite
 saved_model/
 model_weights/
 weights/

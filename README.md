@@ -1,76 +1,177 @@
 # ♻️ Smart Waste Segregation System  
 
-An AI-powered web application that automatically classifies waste as **biodegradable** or **non-biodegradable** using **Deep Learning** and **Computer Vision**.  
+<div align="center">
 
-Users can upload waste images through a modern web interface, and the system uses a trained **EfficientNet-based TensorFlow model** to classify the waste in real-time — making waste identification fast, accurate, and accessible from anywhere.
+An AI-powered web application that automatically classifies waste as **biodegradable** or **non-biodegradable** using Deep Learning and Computer Vision.
+
+[![Live Demo](https://img.shields.io/badge/Live-Demo-success?style=for-the-badge&logo=netlify)](https://waste-frontend.netlify.app/)
+[![Frontend](https://img.shields.io/badge/Frontend-Netlify-00C7B7?style=for-the-badge&logo=netlify)](https://waste-frontend.netlify.app/)
+[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render)](https://render.com)
+
+</div>
+
+---
+
+## 📖 About
+
+This project provides an accessible, web-based solution for waste classification. Simply upload an image of waste through the intuitive interface, and our trained **EfficientNet model** instantly identifies whether it's biodegradable or non-biodegradable — helping promote better recycling habits and environmental awareness.
+
+**Perfect for:**
+- 🏫 Educational institutions teaching environmental science
+- ♻️ Recycling centers and waste management facilities  
+- 🏘️ Community awareness programs
+- 🌱 Anyone wanting to learn about proper waste segregation
+
+---
+
+## 📑 Table of Contents
+
+- [Live Demo](#-live-demo)
+- [Quick Start](#-quick-start)
+- [Features](#-features)
+- [How It Works](#-how-it-works)
+- [Tech Stack](#️-tech-stack)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [Deployment](#️-deployment)
+- [API Documentation](#-api-documentation)
+- [Model Information](#-model-information)
+- [Configuration](#-configuration)
+- [Troubleshooting](#-troubleshooting)
+- [Future Enhancements](#-future-enhancements)
+- [Contributors](#-contributors)
+
+---
+
+## 🌐 Live Demo
+
+<div align="center">
+
+### **[🚀 Try it Now →](https://waste-frontend.netlify.app/)**
+
+**Deployed on:**  
+Frontend: Netlify | Backend: Render
+
+_No installation required — just upload an image and get instant results!_ ✨
+
+</div>
+
+---
+
+## ⚡ Quick Start
+
+**Want to run locally?**
+
+```bash
+# Clone the repository
+git clone https://github.com/Suryansh4711/Smart-Waste-Segregation-System.git
+cd Smart-Waste-Segregation-System
+
+# Start Backend (Terminal 1)
+cd backend
+pip install -r requirements.txt
+python api.py
+
+# Start Frontend (Terminal 2)
+cd frontend
+npm install
+npm run dev
+
+# Open http://localhost:3000 in your browser
+```
 
 ---
 
 ## 🚀 Features  
 - 🔍 **AI-Powered Classification**: Deep learning model trained on waste datasets
-- 🌐 **Web-Based Interface**: Modern Next.js frontend with responsive design
+- 🌐 **Modern Web Interface**: Built with Next.js 15 and React 19
 - ⚡ **Fast API Backend**: FastAPI-powered REST API for real-time predictions
-- ☁️ **Cloud-Ready**: Containerized with Docker and deployable to Google Cloud Run
 - 📊 **Confidence Scores**: Get prediction confidence for each classification
-- 🎨 **Modern UI**: Built with React, TailwindCSS, and Shadcn components
+- 🎨 **Beautiful UI**: TailwindCSS 4 with Shadcn/UI components
+- 📱 **Fully Responsive**: Works seamlessly on desktop and mobile devices
 
 ---
 
-## 🧠 Tech Stack  
+## 🔄 How It Works
 
-**Frontend:**  
-- Next.js 15.5 (React 19)
-- TailwindCSS 4
+1. **Upload Image**: User uploads a photo of waste through the web interface
+2. **Preprocessing**: Image is resized and normalized (224×224 pixels)
+3. **AI Classification**: EfficientNet model analyzes the image
+4. **Results**: System returns classification (biodegradable/non-biodegradable) with confidence score
+5. **Action**: User gets instant feedback to properly segregate waste
+
+---
+
+## 🛠️ Tech Stack  
+
+<table>
+<tr>
+<td valign="top" width="33%">
+
+### Frontend
+- Next.js 15.5
+- React 19
 - TypeScript
-- Shadcn UI Components
+- TailwindCSS 4
+- Shadcn/UI
 - Lucide Icons
 
-**Backend:**  
+</td>
+<td valign="top" width="33%">
+
+### Backend
 - FastAPI
-- TensorFlow 2.16 / Keras
-- EfficientNet (Transfer Learning)
+- TensorFlow 2.16
+- EfficientNet
 - OpenCV
-- Pillow (PIL)
+- Pillow
 - Uvicorn
 
-**Machine Learning:**  
-- TensorFlow/Keras with Apple Metal optimization
-- EfficientNet architecture
-- Image preprocessing and augmentation
-- Model training in Jupyter notebooks
+</td>
+<td valign="top" width="33%">
 
-**DevOps & Deployment:**  
-- Docker & Docker Compose
-- Google Cloud Platform (Cloud Run, Container Registry)
-- Cloud Build for CI/CD
-- Nginx for production frontend serving
+### Deployment
+- Netlify
+- Render
+- Docker
+- Docker Compose
+
+</td>
+</tr>
+</table>
 
 ---
 
 ## 📁 Project Structure
 
-\`\`\`
+```
 Smart-Waste-Segregation-System/
-├── backend/                    # FastAPI backend service
-│   ├── api.py                 # Main API with /predict endpoint
-│   ├── waste_model.h5         # Trained TensorFlow model
-│   ├── waste_model.tflite     # Optimized TFLite model
-│   ├── train_model.ipynb      # Model training notebook
-│   ├── Dockerfile             # Backend container
-│   └── requirements-prod.txt  # Production dependencies
-├── frontend/                   # Next.js frontend application
+├── backend/                      # FastAPI backend service
+│   ├── api.py                   # Main API with /predict endpoint
+│   ├── waste_model.h5           # Trained TensorFlow model
+│   ├── waste_model.tflite       # Optimized TFLite model
+│   ├── train_model.ipynb        # Model training notebook
+│   ├── convert_to_tflite.py     # TFLite conversion script
+│   ├── requirements.txt         # Development dependencies
+│   ├── requirements-prod.txt    # Production dependencies
+│   ├── runtime.txt              # Python version for Render
+│   ├── Dockerfile               # Docker configuration
+│   └── dataset/                 # Training dataset
+│       ├── bio-degradable/
+│       └── non-biodegradable/
+├── frontend/                     # Next.js frontend application
 │   ├── src/
-│   │   ├── app/              # Next.js app router pages
-│   │   └── components/       # React components
-│   ├── Dockerfile            # Frontend container
-│   └── package.json          # Node.js dependencies
-├── docker-compose.yml         # Local development orchestration
-├── cloudbuild.yaml           # GCP Cloud Build configuration
-├── deploy.sh                 # Automated deployment script
-├── test-local.sh             # Local testing script
-├── DEPLOYMENT.md             # Comprehensive deployment guide
-└── QUICKSTART.md             # Quick start instructions
-\`\`\`
+│   │   ├── app/                 # App router pages
+│   │   ├── components/          # React components
+│   │   └── lib/                 # Utility functions
+│   ├── public/                  # Static assets
+│   ├── package.json             # Dependencies
+│   └── Dockerfile               # Docker configuration
+├── docker-compose.yml           # Local Docker development
+├── netlify.toml                 # Netlify config
+├── render.yaml                  # Render config
+└── README.md                    # Documentation
+```
 
 ---
 
@@ -79,148 +180,226 @@ Smart-Waste-Segregation-System/
 ### Prerequisites
 - **Node.js** 20+ and npm/pnpm
 - **Python** 3.10+
-- **Docker Desktop** (for containerized deployment)
-- **Google Cloud SDK** (for cloud deployment)
+- **Docker** (optional, for containerized development)
 
 ### Local Development
 
-**Option 1: Development Mode (Hot Reload)**
+**Option 1: Development Mode (Recommended)**
 
-\`\`\`bash
-# Terminal 1 - Backend
+```bash
+# Terminal 1 - Start Backend
 cd backend
 pip install -r requirements.txt
 python api.py
 # Backend runs on http://localhost:8080
 
-# Terminal 2 - Frontend
+# Terminal 2 - Start Frontend
 cd frontend
 npm install
 npm run dev
 # Frontend runs on http://localhost:3000
-\`\`\`
+```
 
-**Option 2: Docker (Production-like)**
+**Option 2: Using Docker Compose**
 
-\`\`\`bash
-# Build and run with Docker Compose
+```bash
+# Build and start both services
 docker-compose up --build
 
-# Access the application
+# Access the application:
 # Frontend: http://localhost:3000
 # Backend API: http://localhost:8080
-\`\`\`
-
-### Quick Testing
-
-\`\`\`bash
-# Run automated local tests
-./test-local.sh
-\`\`\`
+```
 
 ---
 
 ## ☁️ Deployment
 
-### Deploy to Google Cloud Run
+### 🌐 Live Application
+**Visit:** [https://waste-frontend.netlify.app/](https://waste-frontend.netlify.app/)
 
-\`\`\`bash
-# 1. Login to GCP
-gcloud auth login
+**Hosting:**
+- **Frontend**: Netlify (Automatic deployments from GitHub)
+- **Backend**: Render (Web Service)
 
-# 2. Set your project
-gcloud config set project YOUR_PROJECT_ID
+### Deploy Your Own Instance
 
-# 3. Deploy using Cloud Build
-gcloud builds submit --config=cloudbuild.yaml
+<details>
+<summary><b>Deploy Frontend to Netlify</b></summary>
 
-# OR use the automated script
-./deploy.sh
-\`\`\`
+1. Fork this repository to your GitHub account
+2. Log in to [Netlify](https://netlify.com) and click "Add new site"
+3. Connect your GitHub repository
+4. Configure build settings:
+   - **Base directory**: `frontend`
+   - **Build command**: `npm run build`
+   - **Publish directory**: `.next`
+5. Add environment variable:
+   - `NEXT_PUBLIC_API_URL`: Your Render backend URL
+6. Deploy!
 
-For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
+</details>
+
+<details>
+<summary><b>Deploy Backend to Render</b></summary>
+
+1. Log in to [Render](https://render.com)
+2. Click "New +" and select "Web Service"
+3. Connect your GitHub repository
+4. Configure service:
+   - **Name**: Your service name
+   - **Root directory**: `backend`
+   - **Runtime**: Python 3
+   - **Build command**: `pip install -r requirements-prod.txt`
+   - **Start command**: `uvicorn api:app --host 0.0.0.0 --port $PORT`
+5. Add environment variables (if needed)
+6. Deploy!
+
+</details>
 
 ---
 
-## 🎯 API Endpoints
+## 🎯 API Documentation
 
-### POST \`/predict\`
-Upload an image to classify waste type
+### Health Check
+```bash
+GET /
+```
+Returns API status and version information.
 
-**Request:**
-\`\`\`bash
-curl -X POST "http://localhost:8080/predict" \\
+### Predict Waste Type
+```bash
+POST /predict
+```
+
+Upload an image to classify waste as biodegradable or non-biodegradable.
+
+**Example Request:**
+```bash
+curl -X POST "https://your-backend.onrender.com/predict" \
   -F "file=@waste_image.jpg"
-\`\`\`
+```
 
-**Response:**
-\`\`\`json
+**Example Response:**
+```json
 {
   "prediction": "bio-degradable",
   "confidence": 0.9542
 }
-\`\`\`
+```
+
+**Supported Image Formats:** JPEG, PNG, JPG  
+**Max File Size:** 10MB
 
 ---
 
-## 🧪 Model Details
+## 🧪 Model Information
 
-- **Architecture**: EfficientNet (Transfer Learning)
-- **Input Size**: 224x224 RGB images
-- **Classes**: 
-  - \`bio-degradable\`: Organic waste (food, leaves, paper)
-  - \`non-biodegradable\`: Plastic, metal, glass
-- **Framework**: TensorFlow 2.16 with Keras
-- **Optimization**: Apple Metal acceleration for M-series Macs
-- **Format**: Keras H5 model + TFLite for edge deployment
+| Property | Details |
+|----------|---------|
+| **Architecture** | EfficientNet (Transfer Learning) |
+| **Input Size** | 224×224 RGB images |
+| **Framework** | TensorFlow 2.16 / Keras |
+| **Classes** | `bio-degradable`, `non-biodegradable` |
+| **Model Files** | H5 (full model), TFLite (optimized) |
 
----
-
-## 🌍 Goal  
-To build a smarter, more sustainable way of handling waste through accessible AI technology that anyone can use from their web browser.
+**Classification Examples:**
+- **Biodegradable**: Food scraps, leaves, paper, cardboard, wood
+- **Non-biodegradable**: Plastic, metal, glass, rubber, synthetic materials
 
 ---
 
-## 🔧 Environment Configuration
+## 🔧 Configuration
 
-**Local Development:**
-- Frontend: Set \`NEXT_PUBLIC_API_URL=http://localhost:8080\` in \`frontend/.env.local\`
-- Backend: Runs on port 8080 by default
+### Local Development
+Create `frontend/.env.local`:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8080
+```
 
-**Production (GCP):**
-- Environment variables set automatically during Cloud Build
-- CORS configured for cross-origin requests
-- Health checks enabled for both services
+### Production (Netlify)
+Set environment variable in Netlify dashboard:
+```env
+NEXT_PUBLIC_API_URL=https://your-backend.onrender.com
+```
 
----
-
-## 📚 Documentation
-
-- [QUICKSTART.md](./QUICKSTART.md) - Fast setup guide
-- [DEPLOYMENT.md](./DEPLOYMENT.md) - Complete deployment guide
-- [DEPLOYMENT-SUMMARY.md](./DEPLOYMENT-SUMMARY.md) - Deployment overview
-
----
-
-## 🧩 Future Enhancements  
-- Multi-class classification (recyclable, e-waste, hazardous)
-- Mobile app integration (React Native)
-- Real-time camera classification
-- User authentication and history tracking
-- Analytics dashboard for waste statistics
-- IoT integration for smart bin hardware
-- Multi-language support
+### Backend CORS
+The backend automatically allows requests from:
+- `http://localhost:3000` (local development)
+- Your Netlify frontend URL (production)
 
 ---
 
-## 👨‍💻 Team
+## 🌍 Project Vision
 
-Developed by **Aditya Sharma**, **Suryansh Agarwal**, and **Yash Jain**
+Building a smarter, more sustainable way to handle waste through accessible AI technology. This system helps individuals and organizations quickly identify waste types, promoting better recycling habits and environmental responsibility.
 
-> Built with 💚 using AI, Deep Learning, and sustainable innovation.
+---
+
+## ❓ Troubleshooting
+
+<details>
+<summary><b>Backend API not responding</b></summary>
+
+- Check if backend is running: `http://localhost:8080`
+- Verify Python dependencies: `pip install -r requirements.txt`
+- Check CORS settings in `api.py`
+- Ensure model files exist in `backend/` directory
+
+</details>
+
+<details>
+<summary><b>Frontend can't connect to backend</b></summary>
+
+- Verify `NEXT_PUBLIC_API_URL` in `.env.local`
+- Check if backend URL is correct (should be `http://localhost:8080` for local)
+- Clear browser cache and reload
+- Check browser console for CORS errors
+
+</details>
+
+<details>
+<summary><b>Model prediction errors</b></summary>
+
+- Ensure image is in JPEG/PNG format
+- Check image file size (should be < 10MB)
+- Verify model file `waste_model.h5` exists
+- Check TensorFlow installation: `pip show tensorflow`
+
+</details>
+
+---
+
+## 🚀 Future Enhancements  
+- [ ] Multi-class classification (recyclable, e-waste, hazardous, compostable)
+- [ ] Real-time camera/webcam classification
+- [ ] Mobile app (React Native or Flutter)
+- [ ] User authentication and classification history
+- [ ] Analytics dashboard with waste statistics
+- [ ] Batch image processing
+- [ ] Multi-language support (i18n)
+- [ ] IoT integration for smart waste bins
+
+---
+
+## 👥 Contributors
+
+Built with 💚 by **Aditya Sharma**, **Suryansh Agarwal**, and **Yash Jain**
+
+Contributions, issues, and feature requests are welcome!
 
 ---
 
 ## 📄 License
 
 This project is developed for educational and environmental purposes.
+
+---
+
+<div align="center">
+
+**[⬆ Back to Top](#-smart-waste-segregation-system)**
+
+Made with passion for a sustainable future 🌱
+
+</div>
